@@ -1,6 +1,6 @@
 # Импортируем модули
-from first import LogicFormalizer
-from second import ResolutionEngine
+from first_module import LogicFormalizer
+from second_module import ResolutionEngine
 # Если у вас есть third.py с объяснителем:
 # from third import ProofExplainer
 
