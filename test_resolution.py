@@ -1,11 +1,11 @@
-from resolution_engine import ResolutionEngine
+from src.resolution_engine import ResolutionEngine
 
 def print_detailed_proof(log, engine):
     """Красиво выводит доказательство с нумерацией клауз"""
     print("\n" + "="*60)
     print("ДЕТАЛИЗИРОВАННОЕ ДОКАЗАТЕЛЬСТВО")
     print("="*60)
-    
+
     # Выводим исходные клаузы
     print("ИСХОДНЫЕ КЛАУЗЫ:")
     for step in log:
@@ -14,7 +14,7 @@ def print_detailed_proof(log, engine):
                 print(f"{clause_info['id']}. {clause_info['clause']}  [{clause_info['source']}]")
             break
     print("-" * 40)
-    
+
     # Выводим шаги резолюции
     print("ШАГИ РЕЗОЛЮЦИИ:")
     for step in log:
@@ -23,11 +23,11 @@ def print_detailed_proof(log, engine):
             clause2_id = step['clause2_id']
             resolvent_id = step['resolvent_id']
             resolvent = step['resolvent']
-            
+
             print(f"{resolvent_id}. {resolvent}  [резолюция {clause1_id} и {clause2_id}]")
             if step['unification']:
                 print(f"   Унификация: {step['unification']}")
-        
+
         elif step['type'] == 'contradiction_found':
             print("-" * 40)
             print(f" НАЙДЕНО ПРОТИВОРЕЧИЕ! Доказательство завершено.")
@@ -40,7 +40,7 @@ def print_detailed_proof(log, engine):
 def test_resolution_engine():
     """Тестирование движка резолюций с улучшенным выводом"""
     engine = ResolutionEngine()
-    
+
     # Пример 1: Классический силлогизм
     print("=== ТЕСТ 1: Сократ смертен ===")
     clauses = [
@@ -48,11 +48,11 @@ def test_resolution_engine():
         "¬Человек(x) ∨ Смертен(x)", 
         "¬Смертен(Сократ)"
     ]
-    
+
     success, log = engine.prove(clauses)
     print(f"Результат доказательства: {success}")
     print_detailed_proof(log, engine)
-    
+
     # Пример 2: С квантором существования (ИСПРАВЛЕННЫЙ ВВОД)
     print("\n" + "="*60)
     print("=== ТЕСТ 2: Студент сдал экзамен ===")
@@ -61,7 +61,7 @@ def test_resolution_engine():
         "Студент(Иван)",
         "¬СдалЭкзамен(Иван, y)"
     ]
-    
+
     success2, log2 = engine.prove(clauses2)
     print(f"Результат доказательства: {success2}")
     print_detailed_proof(log2, engine)
@@ -73,14 +73,14 @@ def test_resolution_engine():
     print("Если кто-то студент, то он учится в университете.")
     print("Если кто-то учится в университете, то он сдает экзамены.")
     print("Иван - студент, но он не сдает экзамены.")
-    
+
     clauses3 = [
         "Студент(Иван)",
         "¬Студент(x) ∨ УчитсяВУниверситете(x)", 
         "¬УчитсяВУниверситете(y) ∨ СдаетЭкзамены(y)",
         "¬СдаетЭкзамены(Иван)"
     ]
-    
+
     success3, log3 = engine.prove(clauses3)
     print(f"Результат доказательства: {success3}")
     print_detailed_proof(log3, engine)
@@ -117,7 +117,7 @@ def test_resolution_engine():
     print(f"Результат доказательства: {success5}")
     print_detailed_proof(log5, engine)
 
-    
+
     # Тест 6: Симметричные отношения
     print("\n" + "="*60)
     print("=== ТЕСТ 6: Симметричность ===")

@@ -40,7 +40,7 @@ class LogicProofApp:
         
         self.input_text = scrolledtext.ScrolledText(main_frame, height=4, width=80)
         self.input_text.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
-        
+
         # Кнопки управления
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(row=3, column=0, columnspan=2, pady=(0, 20))
@@ -92,7 +92,117 @@ class LogicProofApp:
         
         # Примеры высказываний
         self.setup_examples_section(main_frame)
+
+        self.setup_text_shortcuts()
     
+
+    def setup_text_shortcuts(self):
+        """Настраивает горячие клавиши и контекстные меню для всех текстовых полей"""
+        widgets = [self.input_text, self.formulas_text, self.proof_text, self.explanation_text]
+        
+        for widget in widgets:
+            self.add_context_menu(widget)
+            self.bind_shortcuts(widget)
+
+    def add_context_menu(self, widget):
+        """Добавляет контекстное меню для текстового поля"""
+        context_menu = tk.Menu(widget, tearoff=0)
+        context_menu.add_command(label="Копировать", 
+                               command=lambda: self.widget_copy(widget))
+        context_menu.add_command(label="Вставить", 
+                               command=lambda: self.widget_paste(widget))
+        context_menu.add_command(label="Вырезать", 
+                               command=lambda: self.widget_cut(widget))
+        context_menu.add_separator()
+        context_menu.add_command(label="Выделить все", 
+                               command=lambda: self.widget_select_all(widget))
+        
+        # Привязываем меню к правой кнопке мыши
+        widget.bind("<Button-3>", lambda event: self.show_context_menu(event, context_menu))
+
+    def bind_shortcuts(self, widget):
+        """Привязывает горячие клавиши к виджету"""
+        # Альтернативный подход - используем привязку на уровне виджета
+        widget.bind('<Control-a>', self._select_all)
+        widget.bind('<Control-c>', self._copy)
+        widget.bind('<Control-v>', self._paste)
+        widget.bind('<Control-x>', self._cut)
+        
+        # Также привяжем комбинации с Shift
+        widget.bind('<Control-A>', self._select_all)
+        widget.bind('<Control-C>', self._copy)
+        widget.bind('<Control-V>', self._paste)
+        widget.bind('<Control-X>', self._cut)
+
+    def _select_all(self, event):
+        """Обработчик Ctrl+A"""
+        event.widget.tag_add('sel', '1.0', 'end')
+        return 'break'
+
+    def _copy(self, event):
+        """Обработчик Ctrl+C"""
+        try:
+            if event.widget.tag_ranges('sel'):
+                # Используем встроенную функциональность копирования
+                event.widget.event_generate('<<Copy>>')
+        except Exception:
+            pass
+        return 'break'
+
+    def _paste(self, event):
+        """Обработчик Ctrl+V"""
+        try:
+            # Используем встроенную функциональность вставки
+            event.widget.event_generate('<<Paste>>')
+        except Exception:
+            pass
+        return 'break'
+
+    def _cut(self, event):
+        """Обработчик Ctrl+X"""
+        try:
+            if event.widget.tag_ranges('sel'):
+                # Используем встроенную функциональность вырезания
+                event.widget.event_generate('<<Cut>>')
+        except Exception:
+            pass
+        return 'break'
+
+    def show_context_menu(self, event, menu):
+        """Показывает контекстное меню"""
+        try:
+            menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            menu.grab_release()
+
+    def widget_copy(self, widget):
+        """Копирует выделенный текст через меню"""
+        try:
+            if widget.tag_ranges('sel'):
+                widget.event_generate('<<Copy>>')
+        except Exception:
+            pass
+
+    def widget_paste(self, widget):
+        """Вставляет текст из буфера обмена через меню"""
+        try:
+            widget.event_generate('<<Paste>>')
+        except Exception:
+            pass
+
+    def widget_cut(self, widget):
+        """Вырезает выделенный текст через меню"""
+        try:
+            if widget.tag_ranges('sel'):
+                widget.event_generate('<<Cut>>')
+        except Exception:
+            pass
+
+    def widget_select_all(self, widget):
+        """Выделяет весь текст через меню"""
+        widget.tag_add('sel', '1.0', 'end')
+
+
     def setup_examples_section(self, parent):
         """Секция с примерами высказываний"""
         examples_frame = ttk.LabelFrame(parent, text="Примеры высказываний", padding="5")
@@ -197,14 +307,14 @@ class LogicProofApp:
             self.proof_text.insert(tk.END, "Не удалось получить лог доказательства")
             return
         
-        result_text = "✅ ДОКАЗАТЕЛЬСТВО УСПЕШНО!\n\n" if success else "❌ ДОКАЗАТЕЛЬСТВО НЕ УДАЛОСЬ\n\n"
+        result_text = "Доказательство успешно!\n\n" if success else "Доказательство не удалось\n\n"
         self.proof_text.insert(tk.END, result_text)
         
         for step in proof_log:
             step_type = step.get('type', 'unknown')
             
             if step_type == 'initial':
-                self.proof_text.insert(tk.END, "ИСХОДНЫЕ КЛАУЗЫ:\n")
+                self.proof_text.insert(tk.END, "Исходные клаузы:\n")
                 for clause_info in step.get('clauses', []):
                     self.proof_text.insert(tk.END, f"  {clause_info['id']}. {clause_info['clause']}\n")
                 self.proof_text.insert(tk.END, "\n")
@@ -225,12 +335,12 @@ class LogicProofApp:
             elif step_type == 'contradiction_found':
                 clause_id = step.get('clause_id', '?')
                 parents = step.get('parents', [])
-                self.proof_text.insert(tk.END, f"🎯 НАЙДЕНА ПУСТАЯ КЛАУЗА {clause_id}!\n")
+                self.proof_text.insert(tk.END, f"НАЙДЕНА ПУСТАЯ КЛАУЗА {clause_id}!\n")
                 self.proof_text.insert(tk.END, f"Получена из клауз: {parents}\n")
                 self.proof_text.insert(tk.END, "ДОКАЗАТЕЛЬСТВО ЗАВЕРШЕНО - ПРОТИВОРЕЧИЕ!\n\n")
             
             elif step_type in ['no_new_clauses', 'timeout', 'error']:
-                self.proof_text.insert(tk.END, f"ℹ️ {step.get('message', '')}\n\n")
+                self.proof_text.insert(tk.END, f"{step.get('message', '')}\n\n")
     
     def generate_explanation(self, proof_log, success):
         """Генерация объяснения на основе лога доказательства"""
@@ -271,7 +381,7 @@ class LogicProofApp:
         """Обновление вкладки с объяснением"""
         self.explanation_text.delete(1.0, tk.END)
         
-        result_marker = "✅ ДОКАЗАНО! " if success else "❒ РЕЗУЛЬТАТ: "
+        result_marker = "Доказано! " if success else "РЕЗУЛЬТАТ: "
         self.explanation_text.insert(tk.END, result_marker)
         
         if explanation and "Ошибка" not in explanation:
