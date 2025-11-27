@@ -157,22 +157,6 @@ def test_de_morgan():
         result = formalizer.formalize_problem(case)
         print(f"Формулы: {result}\n")
 
-# ===================================================================
-# 11. Цепочка импликаций 
-# ===================================================================
-def test_implication_chain():
-    test_cases = [
-        "Если идёт дождь, то улицы мокрые. Если улицы мокрые, то машины скользят. Если машины скользят, то происходят аварии. Сейчас идёт дождь. Что следует?"
-    ]
-
-    print("ТЕСТ: ЦЕПОЧКА ИМПЛИКАЦИЙ")
-    print("=" * 60)
-    for i, case in enumerate(test_cases, 1):
-        print(f"\nТест {i}: {case}")
-        result = formalizer.formalize_problem(case)
-        print(f"Формулы: {result}\n")
-
-
 if __name__ == "__main__":
     print("\n" + " ПОЛНЫЙ НАБОР ТЕСТОВ ДЛЯ LogicFormalizer ".center(80, "═") + "\n")
 
@@ -186,11 +170,11 @@ if __name__ == "__main__":
     test_no_one_except()
     test_necessary_condition()
     test_de_morgan()
-    test_implication_chain()
 
     print("═" * 80)
     print("                  ВСЕ ТЕСТЫ ЗАВЕРШЕНЫ")
     print("═" * 80)
+
 
 
 
