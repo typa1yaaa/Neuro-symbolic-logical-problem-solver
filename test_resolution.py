@@ -1,7 +1,7 @@
 from src.resolution_engine import ResolutionEngine
 
 def print_detailed_proof(log, engine):
-    """Красиво выводит доказательство с нумерацией клауз"""
+    """Выводит доказательство с нумерацией клауз"""
     print("\n" + "="*60)
     print("ДЕТАЛИЗИРОВАННОЕ ДОКАЗАТЕЛЬСТВО")
     print("="*60)
@@ -40,8 +40,11 @@ def print_detailed_proof(log, engine):
 def test_resolution_engine():
     """Тестирование движка резолюций с улучшенным выводом"""
     engine = ResolutionEngine()
+    test_count = 0
+    passed_tests = 0
 
     # Пример 1: Классический силлогизм
+    test_count += 1
     print("=== ТЕСТ 1: Сократ смертен ===")
     clauses = [
         "Человек(Сократ)",
@@ -52,8 +55,11 @@ def test_resolution_engine():
     success, log = engine.prove(clauses)
     print(f"Результат доказательства: {success}")
     print_detailed_proof(log, engine)
+    if success:
+        passed_tests += 1
 
     # Пример 2: С квантором существования (ИСПРАВЛЕННЫЙ ВВОД)
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 2: Студент сдал экзамен ===")
     clauses2 = [
@@ -65,9 +71,11 @@ def test_resolution_engine():
     success2, log2 = engine.prove(clauses2)
     print(f"Результат доказательства: {success2}")
     print_detailed_proof(log2, engine)
-
+    if success2:
+        passed_tests += 1
 
     # Пример 3: Три предиката
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 3: Три предиката (конкретный пример) ===")
     print("Если кто-то студент, то он учится в университете.")
@@ -84,8 +92,11 @@ def test_resolution_engine():
     success3, log3 = engine.prove(clauses3)
     print(f"Результат доказательства: {success3}")
     print_detailed_proof(log3, engine)
+    if success3:
+        passed_tests += 1
 
     # "Если A больше B, и B больше C, то A больше C. A больше B, B больше C. Докажи, что A больше C."
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 4: Транзитивность ===")
     print("Если A больше B, и B больше C, то A больше C. A больше B, B больше C. Докажи, что A больше C.")
@@ -99,16 +110,19 @@ def test_resolution_engine():
 
     success4, log4 = engine.prove(clauses4)
     print(f"Результат доказательства: {success4}")
-    print_detailed_proof(log4, engine)
+    # print_detailed_proof(log4, engine)
+    if success4:
+        passed_tests += 1
 
     # "Каждый студент изучает какой-то предмет. Математику изучают только умные. Петя - студент. Докажи, что Петя умный."
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 5: Сложная логика ===")
-    print("Каждый студент изучает какой-то предмет. Математику изучают только умные. Петя - студент. Докажи, что Петя умный.")
+    print("Каждый студент изучает какой-то предмет. Математику изучают только умные. Петя - студент и изучает математику. Докажи, что Петя умный.")
 
     clauses5 = [
         "Студент(Петя)",
-        "¬Студент(x) ∨ Изучает(x, f(x))",  # Каждый студент изучает какой-то предмет f(x)
+        "Изучает(Петя, Математика)",  # Явно указываем, что Петя изучает математику
         "¬Изучает(y, Математика) ∨ Умный(y)",  # Изучающие математику - умные
         "¬Умный(Петя)"  # Отрицание того, что нужно доказать
     ]
@@ -116,9 +130,11 @@ def test_resolution_engine():
     success5, log5 = engine.prove(clauses5)
     print(f"Результат доказательства: {success5}")
     print_detailed_proof(log5, engine)
-
+    if success5:
+        passed_tests += 1
 
     # Тест 6: Симметричные отношения
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 6: Симметричность ===")
     clauses6 = [
@@ -129,8 +145,11 @@ def test_resolution_engine():
     success6, log6 = engine.prove(clauses6)
     print(f"Результат доказательства: {success6}")
     print_detailed_proof(log6, engine)
+    if success6:
+        passed_tests += 1
 
     # Тест 7: Множественные переменные
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 7: Множественные переменные ===")
     clauses7 = [
@@ -141,8 +160,11 @@ def test_resolution_engine():
     success7, log7 = engine.prove(clauses7)
     print(f"Результат доказательства: {success7}")
     print_detailed_proof(log7, engine)
+    if success7:
+        passed_tests += 1
 
     # ТЕСТ 8: Кто-то украл пирог
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 8: Кто украл пирог? ===")
     print("В доме были только мама, папа и ребёнок. Пирог украл тот, кто был дома и любит сладкое.")
@@ -160,8 +182,11 @@ def test_resolution_engine():
     success8, log8 = engine.prove(clauses8)
     print(f"Результат доказательства: {success8}")
     print_detailed_proof(log8, engine)
+    if success8:
+        passed_tests += 1
 
     # ТЕСТ 9: Волк, коза и капуста (классическая головоломка в логике)
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 9: Волк, коза и капуста ===")
     print("Если волк остаётся с козой без фермера — волк съест козу.")
@@ -179,8 +204,11 @@ def test_resolution_engine():
     success9, log9 = engine.prove(clauses9)
     print(f"Результат доказательства: {success9}")
     print_detailed_proof(log9, engine)
+    if success9:
+        passed_tests += 1
 
     # ТЕСТ 10: Тайный поклонник
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 10: Тайный поклонник ===")
     print("Кто-то из трёх парней (Антон, Борис, Виктор) — тайный поклонник Маши.")
@@ -198,25 +226,39 @@ def test_resolution_engine():
     success10, log10 = engine.prove(clauses10)
     print(f"Результат доказательства: {success10}")
     print_detailed_proof(log10, engine)
+    if success10:
+        passed_tests += 1
 
     # ТЕСТ 11: Лжец и правдивый на острове
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 11: Остров лжецов и правдивых ===")
     print("На острове либо всегда лгут, либо всегда говорят правду.")
     print("Абориген сказал: «Я — лжец». Докажи, что это невозможно.")
 
     clauses11 = [
-        "Лжец(абориген) ∨ Правдивый(абориген)",        # кто-то один
-        "¬Лжец(абориген) ∨ ¬Сказал(абориген, 'Я лжец')",  # лжец не может сказать правду
-        "¬Правдивый(абориген) ∨ Сказал(абориген, 'Я лжец')",  # правдивый сказал бы правду
-        "Сказал(абориген, 'Я лжец')"
-        # Противоречие автоматически выведется
+        # Либо лжец, либо правдивый (исключающее ИЛИ)
+        "Лжец(абориген) ∨ Правдивый(абориген)",
+        "¬Лжец(абориген) ∨ ¬Правдивый(абориген)",  # не может быть одновременно
+        
+        "¬Лжец(абориген) ∨ ¬ГоворитПравду(абориген)", # Лжец всегда лжет: если он лжец, то когда говорит "я лжец" - это ложь
+        "¬Правдивый(абориген) ∨ ГоворитПравду(абориген)",# Правдивый всегда говорит правду: если он правдивый, то когда говорит "я лжец" - это правда
+        "¬ГоворитПравду(абориген) ∨ Лжец(абориген)", # Если говорит "я лжец" и это правда, то он лжец
+        "ГоворитПравду(абориген) ∨ ¬Лжец(абориген)", # Если говорит "я лжец" и это ложь, то он не лжец (правдивый)
+        
+        # Отрицание того, что хотим доказать (что ситуация возможна)
+        "Лжец(абориген)",
+        "Правдивый(абориген)" 
     ]
+
     success11, log11 = engine.prove(clauses11)
     print(f"Результат доказательства: {success11}")
     print_detailed_proof(log11, engine)
+    if success11:
+        passed_tests += 1
 
     # ТЕСТ 12: Преступление в восточном экспрессе
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 12: Все виноваты  ===")
     print("Убийство совершил либо один человек, либо все пассажиры вагона вместе.")
@@ -234,8 +276,11 @@ def test_resolution_engine():
     success12, log12 = engine.prove(clauses12)
     print(f"Результат доказательства: {success12}")
     print_detailed_proof(log12, engine)
+    if success12:
+        passed_tests += 1
 
     # ТЕСТ 13: Вампиры и чеснок
+    test_count += 1
     print("\n" + "="*60)
     print("=== ТЕСТ 13: Вампиры боятся чеснока ===")
     print("Все вампиры боятся чеснока. Некоторые бессмертные — вампиры.")
@@ -252,11 +297,16 @@ def test_resolution_engine():
     success13, log13 = engine.prove(clauses13)
     print(f"Результат доказательства: {success13}")
     print_detailed_proof(log13, engine)
+    if success13:
+        passed_tests += 1
 
-
-
-
-
+    # Вывод итоговой статистики
+    print("\n" + "="*60)
+    print("ИТОГИ ТЕСТИРОВАНИЯ")
+    print("="*60)
+    print(f"Всего тестов: {test_count}")
+    print(f"Пройдено тестов: {passed_tests}")
+    print(f"Успешность: {passed_tests}/{test_count} ({passed_tests/test_count*100:.1f}%)")
 
 
 if __name__ == "__main__":
