@@ -343,39 +343,18 @@ class LogicProofApp:
                 self.proof_text.insert(tk.END, f"{step.get('message', '')}\n\n")
     
     def generate_explanation(self, proof_log, success):
-        """Генерация объяснения на основе лога доказательства"""
+        """Генерация объяснения на основе полного лога доказательства"""
         if not proof_log:
             return "Не удалось сгенерировать объяснение для пустого лога доказательства"
-        
-        # Собираем ключевые шаги для объяснения
-        proof_steps = []
-        
-        for step in proof_log:
-            step_type = step.get('type', '')
-            
-            if step_type == 'resolution_step':
-                clause1 = step.get('clause1', '')
-                clause2 = step.get('clause2', '')
-                resolvent = step.get('resolvent', '')
-                unification = step.get('unification', {})
-                
-                step_desc = f"Резолюция '{clause1}' и '{clause2}'"
-                if unification:
-                    step_desc += f" с унификацией {unification}"
-                step_desc += f" -> '{resolvent}'"
-                proof_steps.append(step_desc)
-            
-            elif step_type == 'contradiction_found':
-                proof_steps.append("Найдено противоречие (пустая клауза) - доказательство завершено")
-        
-        # Если шагов слишком много, берем только ключевые
-        if len(proof_steps) > 5:
-            key_steps = [proof_steps[0], "... промежуточные шаги ...", proof_steps[-1]]
-        else:
-            key_steps = proof_steps
-        
-        explanation = self.explainer.explain_proof(key_steps)
-        return explanation
+    
+        try:
+            explanation = self.explainer.explain_proof(
+                proof_log=proof_log,
+                success=success
+            )
+            return explanation
+        except Exception as e:
+            return f"Ошибка при генерации объяснения: {str(e)}"
     
     def update_explanation_tab(self, explanation, success):
         """Обновление вкладки с объяснением"""
