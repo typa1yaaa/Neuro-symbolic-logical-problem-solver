@@ -6,6 +6,7 @@
 
 import subprocess
 import re
+import os
 from typing import List, Optional
 
 
@@ -134,18 +135,48 @@ class ProofExplainer:
             subprocess.TimeoutExpired: Если выполнение превышает 120 секунд
             Exception: При других ошибках выполнения подпроцесса
         """
-        # Запуск процесса Ollama с заданным промптом
-        process_result = subprocess.run([
-            'ollama', 
-            'run', 
-            self.model_name, 
-            prompt
-        ], 
-        capture_output=True, 
-        text=True, 
-        timeout=120,  # Таймаут 2 минуты
-        encoding='utf-8')
+        if os.name == 'nt':
+            # Запускаем Ollama
+            ollama_path = os.path.join(
+                os.environ["LOCALAPPDATA"],
+                "Programs", "Ollama", "ollama.exe"
+            )
 
+            # Параметры для скрытия консоли
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = 0
+            kwargs = {
+                'startupinfo': startupinfo,
+                'creationflags': subprocess.CREATE_NO_WINDOW
+            }
+
+            process_result = subprocess.run([
+                ollama_path, 
+                'run', 
+                self.model_name, 
+                prompt
+            ], 
+            capture_output=True, 
+            text=True, 
+            timeout=120, 
+            encoding='utf-8',
+            **kwargs
+            )
+                    
+        else:
+            # Для Linux/Mac (оригинальная версия)
+            process_result = subprocess.run([
+                'ollama', 
+                'run', 
+                self.model_name, 
+                prompt
+            ], 
+            capture_output=True, 
+            text=True, 
+            timeout=120,
+            encoding='utf-8')
+            
         # Проверка успешности выполнения команды
         if process_result.returncode == 0:
             return process_result.stdout.strip()
@@ -218,46 +249,3 @@ class ProofExplainer:
 
         return False
 
-
-def demonstrate_explainer():
-    """
-    Демонстрация работы класса ProofExplainer.
-    
-    Показывает пример использования для генерации объяснения
-    формального логического доказательства.
-    """
-    # Инициализация объяснителя
-    explainer = ProofExplainer()
-
-    # Пример формального доказательства (резолюция)
-    proof_steps = [
-        "Шаг 1: Унификация {x/Сократ} в ¬Человек(x) ∨ Смертен(x)",
-        "Шаг 2: Резолюция с Человек(Сократ) -> Смертен(Сократ)", 
-        "Шаг 3: Резолюция Смертен(Сократ) и ¬Смертен(Сократ) -> Противоречие"
-    ]
-
-    # Вывод входных данных
-    print("=" * 60)
-    print("ВХОДНЫЕ ШАГИ ДОКАЗАТЕЛЬСТВА:")
-    print("=" * 60)
-    for i, step in enumerate(proof_steps, 1):
-        print(f"{i}. {step}")
-
-    # Генерация объяснения
-    print("\n" + "=" * 60)
-    print("ГЕНЕРАЦИЯ ОБЪЯСНЕНИЯ...")
-    print("=" * 60)
-
-    explanation = explainer.explain_proof(proof_steps)
-
-    # Вывод результата
-    print("\n" + "=" * 60)
-    print("ОБЪЯСНЕНИЕ ДОКАЗАТЕЛЬСТВА:")
-    print("=" * 60)
-    print(explanation)
-    print("=" * 60)
-
-
-# Точка входа для демонстрации
-if __name__ == "__main__":
-    demonstrate_explainer()
